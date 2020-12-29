@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Remove any incomplete installation
+brew uninstall graphviz  --ignore-dependencies
+
+# Get dependencies
+brew install autoconf autogen automake cairo pango gts gd librsvg libffi swig freeglut lasi poppler devil gtk xquartz
+
+# Fetch source
+git clone https://gitlab.com/graphviz/graphviz.git
+cd graphviz
+git checkout $(git tag | grep stable | sort | tail -n 1)
+
+# Build
+export CXXFLAGS=-std=c++11
+export PATH="/usr/local/opt/qt/bin:$PATH"
+export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/qt/lib/pkgconfig:/opt/X11/lib/pkgconfig"
+export LDFLAGS="-L/usr/local/opt/libffi/lib"
+./autogen.sh --with-quartz
