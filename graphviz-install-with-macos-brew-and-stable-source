@@ -3,17 +3,27 @@
 # Remove any incomplete installation
 brew uninstall graphviz  --ignore-dependencies
 
-# Get dependencies
+# Install dependencies
 brew install autoconf autogen automake cairo pango gts gd librsvg libffi swig freeglut lasi poppler devil gtk xquartz
 
 # Fetch source
 git clone https://gitlab.com/graphviz/graphviz.git
 cd graphviz
-git checkout $(git tag | grep stable | sort | tail -n 1)
+git checkout master
+#git checkout $(git tag | grep stable | sort | tail -n 1)
 
-# Build
+# Tweak source
+sed -i.bak 's/^#include <malloc.h>/#include <malloc\/malloc.h>/' lib/sfdpgen/PriorityQueue.c
+sed -i.bak 's/^int main\(/extern void makeTetrix(int depth, edgefn ef);\n\n&/' 
+
+	$ sed 's/.*Fedora.*/Cygwin\n&/' file
+# Configure
 export CXXFLAGS=-std=c++11
 export PATH="/usr/local/opt/qt/bin:$PATH"
 export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/qt/lib/pkgconfig:/opt/X11/lib/pkgconfig"
 export LDFLAGS="-L/usr/local/opt/libffi/lib"
+
+# Build
 ./autogen.sh --with-quartz
+make
+make install
